@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import VirtualizedList from "./components/VirtualizedList";
 import useSearch from "./hooks/useSearch";
 import highlightMatchSuggestions from "./utils/highlightMatchSuggestions";
