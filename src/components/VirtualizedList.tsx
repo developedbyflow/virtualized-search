@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo, useCallback } from "react";
 import SuggestionItem from "./SuggestionItem";
 
 interface VirtualizedListProps {
@@ -24,23 +24,33 @@ const VirtualizedList: React.FC<VirtualizedListProps> = ({
   const [scrollTop, setScrollTop] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const BUFFERED_ITEMS = 4;
-  console.log({ scrollTop });
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+
+  // Memoize handleScroll to prevent re-creating on every render
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollTop(e.currentTarget.scrollTop);
-  };
+  }, []);
 
-  // Calculate visible range
-  const totalHeight = items.length * itemHeight;
-  const startIndex = Math.max(
-    0,
-    Math.floor(scrollTop / itemHeight) - BUFFERED_ITEMS
-  );
-  const endIndex = Math.min(
-    items.length - 1,
-    Math.ceil((scrollTop + containerHeight) / itemHeight) + BUFFERED_ITEMS
-  );
+  // Memoize total height calculation
+  const totalHeight = useMemo(() => {
+    return items.length * itemHeight;
+  }, [items.length, itemHeight]);
 
-  const visibleItems = items.slice(startIndex, endIndex + 1);
+  // Memoize visible range calculations
+  const { startIndex, visibleItems } = useMemo(() => {
+    const start = Math.max(
+      0,
+      Math.floor(scrollTop / itemHeight) - BUFFERED_ITEMS
+    );
+    const end = Math.min(
+      items.length - 1,
+      Math.ceil((scrollTop + containerHeight) / itemHeight) + BUFFERED_ITEMS
+    );
+
+    return {
+      startIndex: start,
+      visibleItems: items.slice(start, end + 1),
+    };
+  }, [scrollTop, itemHeight, containerHeight, items]);
 
   return (
     <div
@@ -53,7 +63,6 @@ const VirtualizedList: React.FC<VirtualizedListProps> = ({
         position: "relative",
       }}
     >
-      {/* Spacer to maintain total height */}
       <div style={{ height: totalHeight, position: "relative" }}>
         {visibleItems.map((item, index) => {
           const actualIndex = startIndex + index;

@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import VirtualizedList from "./components/VirtualizedList";
 import useSearch from "./hooks/useSearch";
 import highlightMatchSuggestions from "./utils/highlightMatchSuggestions";
@@ -23,6 +24,14 @@ function SearchInput() {
     suggestedItems.length === 0 &&
     !isItemSelected;
 
+  const highlightMatch = useCallback(highlightMatchSuggestions, []);
+
+  const handleClearInput = useCallback(() => {
+    handleChange({
+      target: { value: "" },
+    } as React.ChangeEvent<HTMLInputElement>);
+  }, [handleChange]);
+
   return (
     <section className="search-container">
       <div className="search-header">
@@ -37,14 +46,26 @@ function SearchInput() {
         <label htmlFor="search-box" className="search-label">
           Search Product
         </label>
-        <input
-          id="search-box"
-          type="text"
-          className="search-input"
-          placeholder="Type to search..."
-          value={searchedItem}
-          onChange={handleChange}
-        />
+        <div className="input-with-clear">
+          <input
+            id="search-box"
+            type="text"
+            className="search-input"
+            placeholder="Type to search..."
+            value={searchedItem}
+            onChange={handleChange}
+          />
+          {searchedItem && (
+            <button
+              type="button"
+              className="clear-input-btn"
+              onClick={handleClearInput}
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </div>
 
       {isLoading && <div className="status-message loading">Loading...</div>}
@@ -58,14 +79,14 @@ function SearchInput() {
             onSelect={handleSelect}
             itemHeight={60}
             containerHeight={400}
-            highlightMatch={highlightMatchSuggestions}
+            highlightMatch={highlightMatch}
           />
         </div>
       )}
 
       {hasNoResults && (
         <div className="status-message no-results">
-          No matches found for “{searchedItem.trim()}”
+          No matches found for "{searchedItem.trim()}"
         </div>
       )}
     </section>

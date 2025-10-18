@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { createSimpleLRU } from "../utils/createSimpleLruCache";
 import useDebounce from "./useDebounce";
 
@@ -12,6 +12,7 @@ interface UseSearchReturn {
   isLoading: boolean;
   error: string | null;
   clearCache: () => void;
+  isItemSelected: boolean;
 }
 
 export const useSearch = (getData: GetDataFunction): UseSearchReturn => {
@@ -19,6 +20,7 @@ export const useSearch = (getData: GetDataFunction): UseSearchReturn => {
   const [suggestedItems, setSuggestedItems] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isItemSelected, setIsItemSelected] = useState(false);
 
   const cache = useMemo(() => createSimpleLRU<string[]>(20), []);
   const debouncedQuery = useDebounce(searchedItem, 300);
@@ -70,18 +72,25 @@ export const useSearch = (getData: GetDataFunction): UseSearchReturn => {
     return () => {
       ignore = true;
     };
-  }, [debouncedQuery, getData, cache]);
+  }, [debouncedQuery, getData, cache, isItemSelected]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    setSearchedItem(event.target.value);
-  };
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>): void => {
+      setSearchedItem(event.target.value);
+      setIsItemSelected(false);
+    },
+    []
+  );
 
-  const handleSelect = (item: string): void => {
+  const handleSelect = useCallback((item: string): void => {
     setSearchedItem(item);
     setSuggestedItems([]);
-  };
+    setIsItemSelected(true);
+  }, []);
 
-  const clearCache = (): void => cache.clear();
+  const clearCache = useCallback((): void => {
+    cache.clear();
+  }, [cache]);
 
   return {
     searchedItem,
@@ -91,5 +100,8 @@ export const useSearch = (getData: GetDataFunction): UseSearchReturn => {
     isLoading,
     error,
     clearCache,
+    isItemSelected,
   };
 };
+
+export default useSearch;

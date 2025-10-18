@@ -18,15 +18,17 @@ const SuggestionItem: React.FC<SuggestionItemProps> = ({
   style,
   highlightMatch,
 }) => {
+  // Memoize the onClick handler to prevent re-creating on every render
+  const handleClick = React.useCallback(() => {
+    onSelect(item);
+  }, [onSelect, item]);
+
   return (
-    <div
-      className="suggestion-item"
-      onClick={() => onSelect(item)}
-      style={style}
-    >
+    <div className="suggestion-item" onClick={handleClick} style={style}>
       {highlightMatch(item, searchedItem)}
     </div>
   );
 };
 
-export default SuggestionItem;
+// Wrap with React.memo to prevent re-renders when props haven't changed
+export default React.memo(SuggestionItem);
