@@ -21,7 +21,7 @@ interface AlgoliaHit {
 export const getDataFromAPI = async (query: string): Promise<string[]> => {
   const encodedQuery = encodeURIComponent(query);
   const response = await fetch(
-    `https://dummyjson.com/products/search?q=${encodedQuery}&limit=20`
+    `https://dummyjson.com/products/search?q=${encodedQuery}&limit=100`
   );
 
   if (!response.ok) {
@@ -38,7 +38,7 @@ export const getDataFromAlgolia = async (query: string): Promise<string[]> => {
     indexName: "algolia_apparel_sample_dataset",
     searchParams: {
       query: query,
-      hitsPerPage: 20,
+      hitsPerPage: 100,
     },
   });
   return response.hits.map((p: AlgoliaHit) => p.title || "");

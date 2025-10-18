@@ -1,3 +1,4 @@
+import VirtualizedList from "./components/VirtualizedList";
 import useSearch from "./hooks/useSearch";
 import highlightMatchSuggestions from "./utils/highlightMatchSuggestions";
 import { getDataFromAlgolia } from "./utils/getApiData";
@@ -50,17 +51,16 @@ function SearchInput() {
       {error && <div className="status-message error">{error}</div>}
 
       {!isLoading && suggestedItems.length > 0 && (
-        <ul className="suggestions-list">
-          {suggestedItems.map((item, index) => (
-            <li
-              key={index}
-              onClick={() => handleSelect(item)}
-              className="suggestion-item"
-            >
-              {highlightMatchSuggestions(item, searchedItem)}
-            </li>
-          ))}
-        </ul>
+        <div className="suggestions-list">
+          <VirtualizedList
+            items={suggestedItems}
+            searchedItem={searchedItem}
+            onSelect={handleSelect}
+            itemHeight={60}
+            containerHeight={400}
+            highlightMatch={highlightMatchSuggestions}
+          />
+        </div>
       )}
 
       {hasNoResults && (
