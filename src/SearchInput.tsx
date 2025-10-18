@@ -15,7 +15,7 @@ function SearchInput() {
     error,
     clearCache,
     isItemSelected,
-  } = useSearch(getDataFromAlgolia);
+  } = useSearch(getDataFromAlgolia); // if not working, import and use getDataFromAPI
 
   const hasNoResults =
     !isLoading &&

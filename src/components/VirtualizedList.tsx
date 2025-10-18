@@ -25,17 +25,17 @@ const VirtualizedList: React.FC<VirtualizedListProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const BUFFERED_ITEMS = 4;
 
-  // Memoize handleScroll to prevent re-creating on every render
+
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollTop(e.currentTarget.scrollTop);
   }, []);
 
-  // Memoize total height calculation
+
   const totalHeight = useMemo(() => {
     return items.length * itemHeight;
   }, [items.length, itemHeight]);
 
-  // Memoize visible range calculations
+
   const { startIndex, visibleItems } = useMemo(() => {
     const start = Math.max(
       0,

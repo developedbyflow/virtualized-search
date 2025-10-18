@@ -1,4 +1,7 @@
 import { algoliasearch } from "algoliasearch";
+
+// Bad practice: exposing API keys in frontend code
+// Used for demo purpose only
 const client = algoliasearch("LL89EYET9C", "5b81e52c6324bd78dbd61ff03cd87b4c");
 
 interface Product {
